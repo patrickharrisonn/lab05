@@ -12,7 +12,6 @@ library(tidyverse)
 library(ggplot2)
 ```
 
-
 # Questioning data visualisations
 
 ## Image 1
@@ -24,7 +23,7 @@ knitr::include_graphics("img/Speaking-the-world.jpg")
 _Write your comments about image 1 below_
 
 
-
+bars not very helpful as size not representative of no. values
 
 
 ## Image 2
@@ -35,7 +34,7 @@ knitr::include_graphics("img/rose-pop-density-total-area-bw.jpg")
 
 _Write your comments about image 2 below_
 
-
+No numbers so not easy to get proper values, different sizes of sections not helpful.
 
 
 ## Image 3
@@ -46,7 +45,8 @@ knitr::include_graphics("img/life-expectancy-rule-of-law.png")
 
 _Write your comments about image 3 below_
 
-
+overlappting points makes hard to read, 
+clearly displays a trend
 
 
 ## Image 4
@@ -58,7 +58,7 @@ knitr::include_graphics("img/global-income-dist.PNG")
 _Write your comments about image 4 below_
 
 
-
+clearly displayed data
 
 
 # Exercises
@@ -72,13 +72,15 @@ staff <- read_csv("data/instructional-staff.csv")
 
 What is the difference between *wide format* data and *long format* data?
 
+wide dqta every data point is a new column, leading to a column heavy layout
 
 Is the format `staff` data *wide* or *long*?
 
+wide
 
 How many observations are there in the data set?
 
-
+55
 
 
 ## Exercise 2
@@ -86,13 +88,13 @@ How many observations are there in the data set?
 ```{r pivoting}
 ## Uncomment and complete the following code
 
-#staff_long <- ___ %>%
-#  ___(
-#    cols = ____, 
-#    names_to = "_____",
-#    values_to = "percent"
-#    )
-
+staff_long <- staff%>%
+  pivot_longer(
+    cols = -c(faculty_type), 
+    names_to = "Year",
+    values_to = "percent"
+    )
+staff_long
 ```
 
 
@@ -101,7 +103,11 @@ How many observations are there in the data set?
 ```{r dot-plot}
 # Write your code for Exercise 3 here
 
-
+ggplot(data = staff_long,
+       mapping = aes(y = Year, 
+                     x = percent, 
+                     colour = faculty_type)) +
+  geom_point()
 
 ```
 
@@ -110,6 +116,12 @@ How many observations are there in the data set?
 ```{r bad-line-plot}
 # Write your code for Exercise 4 here
 
+ggplot(data = staff_long,
+       mapping = aes(x = Year, 
+                     y = percent, 
+                     colour = faculty_type)) +
+  geom_point()+
+  geom_smooth()
 
 
 ```
@@ -119,8 +131,15 @@ How many observations are there in the data set?
 ```{r mutate-year}
 ## Uncomment and complete the following code
 
-#staff_long <- staff_long %>%
-#  mutate(year = ______(year))
+staff_long <- staff_long %>%
+  mutate(Year = as.double(Year))
+ggplot(data = staff_long,
+       mapping = aes(x = Year, 
+                     y = percent, 
+                     colour = faculty_type)) +
+  geom_point()+
+  geom_smooth(as=FALSE)
+
 ```
 
 
@@ -137,6 +156,16 @@ How many observations are there in the data set?
 # Write your code for Exercise 6 here
 
 
+staff_long <- staff_long %>%
+  mutate(Year = as.double(Year))
+ggplot(data = staff_long,
+       mapping = aes(x = Year, 
+                     y = percent, 
+                     colour = faculty_type)) +
+  geom_point()+
+  geom_smooth()+
+  labs(title="Graph to show change of percentage faculty type with year.")
+
 
 
 ```
@@ -145,9 +174,9 @@ How many observations are there in the data set?
 
 _Write below your ideas for adapting the line plot_
 
-* Idea 1
-* Idea 2
-* Idea 3
+* Change non relevant lines to b+w
+* 
+* 
 * ...
 
 
@@ -155,8 +184,26 @@ _Write below your ideas for adapting the line plot_
 
 ```{r implement-Ex7}
 # Write your code for Exercise 8 here
+view(staff_long)
 
-
+custom_colours <- c(
+  "Full-Time Tenured Faculty"="black",
+  "	Full-Time Tenure-Track Faculty"="gray50",
+  "Full-Time Non-Tenure-Track Faculty"="gray80",
+  "Graduate Student Employees"="gray90",
+  "Part-Time Faculty"="firebrick")
+  
+  
+staff_long <- staff_long %>%
+  mutate(Year = as.double(Year))
+ggplot(data = staff_long,
+       mapping = aes(x = Year, 
+                     y = percent, 
+                     colour = faculty_type)) +
+  geom_point()+
+  geom_smooth()+
+  labs(title="Graph to show change of percentage faculty type with year.")+
+  scale_colour_manual(values=custom_colours)
 
 ```
 
